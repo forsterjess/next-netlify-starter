@@ -1,90 +1,72 @@
-# Next + Netlify Starter
+# Node.js OAuth 2.0 Quickstart
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/46648482-644c-4c80-bafb-872057e51b6b/deploy-status)](https://app.netlify.com/sites/next-dev-starter/deploys)
+A quickstart appy for integrators looking to use HubSpot's OAuth 2.0. Written in Node.js.
 
-This is a [Next.js](https://nextjs.org/) v12 project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) and set up to be instantly deployed to [Netlify](https://url.netlify.com/SyTBPVamO)!
+_**Note:** This app does not store any data in a persistent way, so restarting the app will clear the retrieved access tokens._
 
-This project is a very minimal starter that includes 2 sample components, a global stylesheet, a `netlify.toml` for deployment, and a `jsconfig.json` for setting up absolute imports and aliases. With Netlify, you'll have access to features like Preview Mode, server-side rendering/incremental static regeneration via Netlify Functions, and internationalized routing on deploy automatically.
+## What the app does
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/netlify-templates/next-netlify-starter&utm_source=github&utm_medium=nextstarter-cs&utm_campaign=devex-cs)
+1. **Redirect to HubSpot's OAuth 2.0 server**
 
-(If you click this button, it will create a new repo for you that looks exactly like this one, and sets that repo up immediately for deployment on Netlify)
+   When you open your browser to `http://localhost:3000/install`, the app will redirect you to the authorization page on
+   HubSpot's server. Here you will choose which account you'd like to install the app in and give consent for it to act
+   on your behalf. When this is complete, HubSpot will redirect you back to the app.
 
-## Table of Contents:
+2. **Exchange an authorization code for access tokens**
 
-- [Getting Started](#getting-started)
-- [Installation options](#installation-options)
-- [Testing](#testing)
-  - [Included Default Testing](#included-default-testing)
-  - [Removing Renovate](#removing-renovate)
-  - [Removing Cypress](#removing-cypress)
+   Now that you're back in the app, it will retrieve an access token and refresh token from HubSpot's server, using an
+   authorization code that was supplied by HubSpot when you granted access to the app.
 
-## Getting Started
+3. **Retrieve a contact**
 
-First, run the development server:
+   When the app has received an access token, it will redirect you to `http://localhost:3000/`. It will then use the access token to
+   make a query to HubSpot's Contacts API, and display the retrieved contact's name on the page.
+   
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
+Before running the quickstart app, make sure you have:
+
+1. The tools required to run using the method of your choice:
+   - Option 1: Running locally using Node.js: [Node.js (>=6)](https://nodejs.org) and [yarn](https://yarnpkg.com/en/docs/install)
+   - Option 2: Running in a Docker container: [Docker (>=1.13)](https://docs.docker.com/install/)
+2. A free HubSpot developer account ([sign up](https://app.hubspot.com/signup/developers))
+3. An app associated with your developer account ([create an app](https://developers.hubspot.com/docs/faq/how-do-i-create-an-app-in-hubspot))
+4. A HubSpot account to install the app in (you can use an existing one, or [create a test account](https://developers.hubspot.com/docs/faq/how-do-i-create-a-test-account))
+
+_**Note:** You must be a super-admin for the account that you want to install the app in._
+
+## Option 1: Running locally using Node.js
+
+1. Clone the repository:
+   ```bash
+   $ git clone git@github.com:HubSpot/oauth-quickstart-nodejs.git
+   ```
+2. Create a **`.env`** file in the root of the repository with the ID and secret for your app (found on the app settings page), eg:
+   ```
+   CLIENT_ID='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+   CLIENT_SECRET='yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy'
+   SCOPE='crm.contacts.read,forms'
+   ```
+   You can also add a `SCOPE` environment variable to specify a custom set of scopes. The scopes can be separated by a comma, space, or URL-encoded space (`%20`)
+3. From the root of the repository, run:
+   ```bash
+   $ yarn install
+   $ yarn start
+   ```
+4. Open your browser to `http://localhost:3000/install` to kick off the OAuth 2.0 flow
+
+---
+
+## Option 2: Running in a Docker container
+
+1. Build an image of the quickstart app
+
+```
+$ docker build -t hs-oauth-quickstart:latest git://github.com/HubSpot/oauth-quickstart-nodejs.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run a container with the new image
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-### Installation options
-
-**Option one:** One-click deploy
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/netlify-templates/next-netlify-starter&utm_source=github&utm_medium=nextstarter-cs&utm_campaign=devex-cs)
-
-**Option two:** Manual clone
-
-1. Clone this repo: `git clone https://github.com/netlify-templates/next-netlify-starter.git`
-2. Navigate to the directory and run `npm install`
-3. Run `npm run dev`
-4. Make your changes
-5. Connect to [Netlify](https://url.netlify.com/Bk4UicocL) manually (the `netlify.toml` file is the one you'll need to make sure stays intact to make sure the export is done and pointed to the right stuff)
-
-## Testing
-
-### Included Default Testing
-
-We’ve included some tooling that helps us maintain these templates. This template currently uses:
-
-- [Renovate](https://www.mend.io/free-developer-tools/renovate/) - to regularly update our dependencies
-- [Cypress](https://www.cypress.io/) - to run tests against how the template runs in the browser
-- [Cypress Netlify Build Plugin](https://github.com/cypress-io/netlify-plugin-cypress) - to run our tests during our build process
-
-If your team is not interested in this tooling, you can remove them with ease!
-
-### Removing Renovate
-
-In order to keep our project up-to-date with dependencies we use a tool called [Renovate](https://github.com/marketplace/renovate). If you’re not interested in this tooling, delete the `renovate.json` file and commit that onto your main branch.
-
-### Removing Cypress
-
-For our testing, we use [Cypress](https://www.cypress.io/) for end-to-end testing. This makes sure that we can validate that our templates are rendering and displaying as we’d expect. By default, we have Cypress not generate deploy links if our tests don’t pass. If you’d like to keep Cypress and still generate the deploy links, go into your `netlify.toml` and delete the plugin configuration lines:
-
-```diff
-[[plugins]]
-  package = "netlify-plugin-cypress"
--  [plugins.inputs.postBuild]
--    enable = true
--
--  [plugins.inputs]
--    enable = false 
 ```
-
-If you’d like to remove the `netlify-plugin-cypress` build plugin entirely, you’d need to delete the entire block above instead. And then make sure sure to remove the package from the dependencies using:
-
-```bash
-npm uninstall -D netlify-plugin-cypress
-```
-
-And lastly if you’d like to remove Cypress entirely, delete the entire `cypress` folder and the `cypress.config.ts` file. Then remove the dependency using:
-
-```bash
-npm uninstall -S cypress
+$ docker run --init -it -p 3000:3000 -e CLIENT_SECRET=$CLIENT_SECRET -e CLIENT_ID=$CLIENT_ID -e SCOPE=contacts,forms hs-oauth-quickstart:latest
 ```
